@@ -9,19 +9,19 @@
 #include "dev/adxl345.h"
 
 #define ACCM_READ_INTERVAL    CLOCK_SECOND * 2
-//#define EVENT_INTERVAL		CLOCK_SECOND * 5
+#define EVENT_INTERVAL		CLOCK_SECOND * 5
 
 /*---------------------------------------------------------------------------*/
 /* Declare our "main" process, the client process*/
 PROCESS(client_process, "Clicker client");
-//PROCESS(event_timing, "event scheduling");
+PROCESS(event_timing, "event scheduling");
 /* The client process should be started automatically when
  * the node has booted. */
-AUTOSTART_PROCESSES(&client_process);
+AUTOSTART_PROCESSES(&client_process, &event_timing);
 /*---------------------------------------------------------------------------*/
 //timer for accelerometer read interval
 static struct etimer acc_timer;
-//static struct etimer event_timer;
+static struct etimer event_timer;
 uint16_t threshold = 100;
 static bool button_triggered = 0;
 static bool acc_triggered = 0;
@@ -65,7 +65,7 @@ PROCESS_THREAD(client_process, ev, data) {
 		 * point to the sensor that caused the event.
 		 * Here we wait until the button was pressed. */
 		PROCESS_WAIT_EVENT_UNTIL((ev == sensors_event && data == &button_sensor) || (etimer_expired(&acc_timer)));
-		//process_poll(&event_timing);
+		process_poll(&event_timing);
 		
 		x_1 = accm_read_axis(X_AXIS);
 
@@ -85,11 +85,17 @@ PROCESS_THREAD(client_process, ev, data) {
 		}	
 
 		if (acc_triggered == 1 && button_triggered == 1) {
+			if (process_is_running(&event_timing) == 0){
 				nullnet_len = 3;
 				leds_toggle(LEDS_RED);
 				leds_toggle(LEDS_GREEN);
 				NETSTACK_NETWORK.output(NULL);
 				printf("btn and acc Sent\n");
+			} else if (ev == PROCESS_EVENT_TIMER){
+				nullnet_len = 0;
+				leds_toggle(LEDS_BLUE);
+				printf("Distinct events since timing too long and timer expired\n");
+			}
 		} else if(button_triggered == 1 && acc_triggered == 0) {
 			nullnet_len = 2;
 			leds_toggle(LEDS_GREEN);
@@ -109,16 +115,15 @@ PROCESS_THREAD(client_process, ev, data) {
 	PROCESS_END();
 }
 
-// PROCESS_THREAD(event_timing, ev, data) {
-//   PROCESS_BEGIN();
+PROCESS_THREAD(event_timing, ev, data) {
+  PROCESS_BEGIN();
 
-//   while (1){
-//       /* Set the LED off timer for 10 seconds */
-//     etimer_set(&event_timer, EVENT_INTERVAL);
+  while (1){
+    etimer_set(&event_timer, EVENT_INTERVAL);
 
-//     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&event_timer));
-// 	process_post(&client_process, PROCESS_EVENT_TIMER, NULL);
+    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&event_timer));
+	process_post(&client_process, PROCESS_EVENT_TIMER, NULL);
  
-//     }
-//     PROCESS_END();
-// }
+    }
+    PROCESS_END();
+}
