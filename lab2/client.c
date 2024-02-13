@@ -8,7 +8,7 @@
 #include "net/nullnet/nullnet.h"
 #include "dev/adxl345.h"
 
-#define ACCM_READ_INTERVAL    CLOCK_SECOND
+#define ACCM_READ_INTERVAL    CLOCK_SECOND * 5
 
 /*---------------------------------------------------------------------------*/
 /* Declare our "main" process, the client process*/
@@ -17,6 +17,7 @@ PROCESS(client_process, "Clicker client");
  * the node has booted. */
 AUTOSTART_PROCESSES(&client_process);
 /*---------------------------------------------------------------------------*/
+//timer for accelerometer read interval
 static struct etimer et;
 uint16_t threshold = 100;
 
@@ -34,7 +35,7 @@ static void recv(const void *data, uint16_t len,
 /* Our main process. */
 PROCESS_THREAD(client_process, ev, data) {
 	static char payload[] = "hej";
-	int16_t x_1, x_2 = 0;
+	int16_t x = 0;
 	PROCESS_BEGIN();
 
 	/* Activate the button sensor. */
@@ -45,7 +46,7 @@ PROCESS_THREAD(client_process, ev, data) {
 
 	/* Initialize NullNet */
 	nullnet_buf = (uint8_t *)&payload;
-	nullnet_len = sizeof(payload); //bandwidth?
+	nullnet_len = sizeof(payload); 
 	nullnet_set_input_callback(recv);
 
 
@@ -57,28 +58,26 @@ PROCESS_THREAD(client_process, ev, data) {
 		 * event. In the case of a sensors_event, data will
 		 * point to the sensor that caused the event.
 		 * Here we wait until the button was pressed. */
-		//PROCESS_WAIT_EVENT_UNTIL(ev == sensors_event && data == &button_sensor);
-		x_1 = accm_read_axis(X_AXIS);
-		leds_off(LEDS_ALL);
+		PROCESS_WAIT_EVENT_UNTIL(ev == sensors_event && data == &button_sensor || etimer_expired(&et));
+
+		x = accm_read_axis(X_AXIS);
 
 		/* Copy the string "hej" into the packet buffer. */
 		memcpy(nullnet_buf, &payload, sizeof(payload));
     	nullnet_len = sizeof(payload);
 
+		result = process_post(&client_process, ev == sensors_event, data == &button_sensor);
 
-		if (abs(x_2 - x_1) > threshold) {
-			nullnet_len = 2;
-			NETSTACK_NETWORK.output(NULL);
-		} else if (ev == sensors_event && data == &button_sensor){
-			nullnet_len = 1;
-			NETSTACK_NETWORK.output(NULL);
-		}else{
-			nullnet_len = 0;
+		if ((x > threshold) || (-1 * x > threshold)) {
+			leds_toggle(LEDS_RED);
 			NETSTACK_NETWORK.output(NULL);
 		}
-		x_2 = x_1;	
-		printf("x2 value  %d\n",x_2);
 
+		if(result == 0){
+			leds_toggle(LEDS_GREEN);
+			NETSTACK_NETWORK.output(NULL);
+		}
+		
 		etimer_set(&et, ACCM_READ_INTERVAL);
       	PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
 	}
