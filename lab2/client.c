@@ -9,6 +9,7 @@
 #include "dev/adxl345.h"
 
 #define ACCM_READ_INTERVAL    CLOCK_SECOND * 5
+#define EVENT_INTERVAL		CLOCK_SECOND * 10
 
 /*---------------------------------------------------------------------------*/
 /* Declare our "main" process, the client process*/
@@ -18,8 +19,11 @@ PROCESS(client_process, "Clicker client");
 AUTOSTART_PROCESSES(&client_process);
 /*---------------------------------------------------------------------------*/
 //timer for accelerometer read interval
-static struct etimer et;
+static struct etimer acc_timer;
+static struct etimer event_timer;
 uint16_t threshold = 100;
+uint16_t button_triggered = 0;
+uint16_t acc_triggered = 0;
 
 /* Callback function for received packets.
  *
@@ -59,33 +63,63 @@ PROCESS_THREAD(client_process, ev, data) {
 		 * event. In the case of a sensors_event, data will
 		 * point to the sensor that caused the event.
 		 * Here we wait until the button was pressed. */
-		PROCESS_WAIT_EVENT_UNTIL((ev == sensors_event && data == &button_sensor) || (etimer_expired(&et)));
-
+		PROCESS_WAIT_EVENT_UNTIL((ev == sensors_event && data == &button_sensor) || (etimer_expired(&acc_timer)));
+		process_poll(&event_timing);
+		
 		x = accm_read_axis(X_AXIS);
 
 		/* Copy the string "hej" into the packet buffer. */
 		memcpy(nullnet_buf, &payload, sizeof(payload));
-    	nullnet_len = sizeof(payload);
-
-		result = process_post(&client_process, ev == sensors_event, NULL);
 
 		if ((x > threshold) || (-1 * x > threshold)) {
-			NETSTACK_NETWORK.output(NULL);
-			leds_toggle(LEDS_RED);
-			printf("acc Sent\n");
+			acc_triggered = 1;	
+        } else {
+			acc_triggered = 0;
 		}
 
-		if(result == PROCESS_ERR_OK) {
+		if(ev == sensors_event && data == &button_sensor){
+			button_triggered = 1;
+		} else {
+			button_triggered = 0;
+		}	
+
+		if (acc_triggered && button_triggered) {
+			if (ev == PROCESS_EVENT_TIMER){
+				nullnet_len = 3;
+				leds_toggle(LEDS_RED);
+				leds_toggle(LEDS_GREEN);
+				NETSTACK_NETWORK.output(NULL);
+				printf("acc and btn Sent\n");
+			}
+		} else if(butten_triggered) {
+			nullnet_len = 2;
+			leds_toggle(LEDS_GREEN);
 			NETSTACK_NETWORK.output(NULL);
 			printf("btn Sent\n");
-			leds_toggle(LEDS_GREEN);
-		} else {
-			printf("Error\n");
+		} else{
+			nullnet_len = 1;
+			leds_toggle(LEDS_RED);
+			NETSTACK_NETWORK.output(NULL);
+			printf("acc Sent\n");
 		}
-		
-		etimer_set(&et, ACCM_READ_INTERVAL);
-      	PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
+	
+		etimer_set(&acc_timer, ACCM_READ_INTERVAL);
+      	PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&acc_timer));
 	}
 
 	PROCESS_END();
+}
+
+PROCESS_THREAD(event_timing, ev, data) {
+  PROCESS_BEGIN();
+
+  while (1){
+      /* Set the LED off timer for 10 seconds */
+    etimer_set(&event_timer, EVENT_INTERVAL);
+
+    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&ledETimer));
+	post_process(&client_process, PROCESS_EVENT_TIMER, NULL);
+ 
+    }
+    PROCESS_END();
 }
