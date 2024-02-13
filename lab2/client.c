@@ -8,13 +8,13 @@
 #include "net/nullnet/nullnet.h"
 #include "dev/adxl345.h"
 
-#define ACCM_READ_INTERVAL    CLOCK_SECOND * 5
-#define EVENT_INTERVAL		CLOCK_SECOND * 10
+#define ACCM_READ_INTERVAL    CLOCK_SECOND * 2
+#define EVENT_INTERVAL		CLOCK_SECOND * 5
 
 /*---------------------------------------------------------------------------*/
 /* Declare our "main" process, the client process*/
 PROCESS(client_process, "Clicker client");
-PROCESS(event_timing, "LED handling process");
+PROCESS(event_timing, "event scheduling");
 /* The client process should be started automatically when
  * the node has booted. */
 AUTOSTART_PROCESSES(&client_process, &event_timing);
@@ -67,7 +67,7 @@ PROCESS_THREAD(client_process, ev, data) {
 		PROCESS_WAIT_EVENT_UNTIL((ev == sensors_event && data == &button_sensor) || (etimer_expired(&acc_timer)));
 		process_poll(&event_timing);
 		
-		x = accm_read_axis(X_AXIS);
+		x_1 = accm_read_axis(X_AXIS);
 
 		/* Copy the string "hej" into the packet buffer. */
 		memcpy(nullnet_buf, &payload, sizeof(payload));
