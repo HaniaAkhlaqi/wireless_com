@@ -14,16 +14,18 @@
 /*---------------------------------------------------------------------------*/
 /* Declare our "main" process, the client process*/
 PROCESS(client_process, "Clicker client");
+PROCESS(event_timing, "LED handling process");
 /* The client process should be started automatically when
  * the node has booted. */
-AUTOSTART_PROCESSES(&client_process);
+AUTOSTART_PROCESSES(&client_process, &event_timing);
 /*---------------------------------------------------------------------------*/
 //timer for accelerometer read interval
 static struct etimer acc_timer;
 static struct etimer event_timer;
 uint16_t threshold = 100;
-uint16_t button_triggered = 0;
-uint16_t acc_triggered = 0;
+static bool button_triggered = 0;
+static bool acc_triggered = 0;
+/*---------------------------------------------------------------------------*/
 
 /* Callback function for received packets.
  *
@@ -40,7 +42,6 @@ static void recv(const void *data, uint16_t len,
 PROCESS_THREAD(client_process, ev, data) {
 	static char payload[] = "hej";
 	int16_t x = 0;
-	int result;
 	PROCESS_BEGIN();
 
 	/* Activate the button sensor. */
