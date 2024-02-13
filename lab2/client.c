@@ -58,7 +58,7 @@ PROCESS_THREAD(client_process, ev, data) {
 		 * event. In the case of a sensors_event, data will
 		 * point to the sensor that caused the event.
 		 * Here we wait until the button was pressed. */
-		PROCESS_WAIT_EVENT_UNTIL(ev == sensors_event && data == &button_sensor || etimer_expired(&et));
+		PROCESS_WAIT_EVENT_UNTIL((ev == sensors_event && data == &button_sensor) || (etimer_expired(&et)));
 
 		x = accm_read_axis(X_AXIS);
 
@@ -66,16 +66,19 @@ PROCESS_THREAD(client_process, ev, data) {
 		memcpy(nullnet_buf, &payload, sizeof(payload));
     	nullnet_len = sizeof(payload);
 
-		result = process_post(&client_process, ev == sensors_event, data == &button_sensor);
+		result = process_post(&client_process, ev == sensors_event, data == button_sensor);
 
 		if ((x > threshold) || (-1 * x > threshold)) {
 			leds_toggle(LEDS_RED);
 			NETSTACK_NETWORK.output(NULL);
 		}
 
-		if(result == 0){
-			leds_toggle(LEDS_GREEN);
+		if(result == PROCESS_ERR_OK) {
+			printf("Sent\n");
 			NETSTACK_NETWORK.output(NULL);
+			leds_toggle(LEDS_Green);
+		} else {
+			printf("Error\n");
 		}
 		
 		etimer_set(&et, ACCM_READ_INTERVAL);
