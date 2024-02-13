@@ -22,7 +22,7 @@ AUTOSTART_PROCESSES(&client_process, &event_timing);
 //timer for accelerometer read interval
 static struct etimer acc_timer;
 static struct etimer event_timer;
-uint16_t threshold = 500;
+uint16_t threshold = 100;
 static bool button_triggered = 0;
 static bool acc_triggered = 0;
 /*---------------------------------------------------------------------------*/
@@ -41,7 +41,7 @@ static void recv(const void *data, uint16_t len,
 /* Our main process. */
 PROCESS_THREAD(client_process, ev, data) {
 	static char payload[] = "hej";
-	int16_t x = 0;
+	int16_t x_1, x_2 = 0;
 	PROCESS_BEGIN();
 
 	/* Activate the button sensor. */
@@ -72,7 +72,7 @@ PROCESS_THREAD(client_process, ev, data) {
 		/* Copy the string "hej" into the packet buffer. */
 		memcpy(nullnet_buf, &payload, sizeof(payload));
 
-		if ((x > threshold) || (-1 * x > threshold)) {
+		if (abs(x_2 - x_1) > threshold) {
 			acc_triggered = 1;	
         } else {
 			acc_triggered = 0;
@@ -84,7 +84,7 @@ PROCESS_THREAD(client_process, ev, data) {
 			button_triggered = 0;
 		}	
 
-		if (acc_triggered && button_triggered) {
+		if (acc_triggered == 1 && button_triggered == 1) {
 			if (ev == PROCESS_EVENT_TIMER){
 				nullnet_len = 3;
 				leds_toggle(LEDS_RED);
@@ -92,18 +92,18 @@ PROCESS_THREAD(client_process, ev, data) {
 				NETSTACK_NETWORK.output(NULL);
 				printf("acc and btn Sent\n");
 			}
-		} else if(button_triggered) {
+		} else if(button_triggered == 1 && acc_triggered == 0) {
 			nullnet_len = 2;
 			leds_toggle(LEDS_GREEN);
 			NETSTACK_NETWORK.output(NULL);
 			printf("btn Sent\n");
-		} else{
+		} else if (acc_triggered == 1 && button_triggered == 0){
 			nullnet_len = 1;
 			leds_toggle(LEDS_RED);
 			NETSTACK_NETWORK.output(NULL);
 			printf("acc Sent\n");
 		}
-	
+		x_2 = x_1;
 		etimer_set(&acc_timer, ACCM_READ_INTERVAL);
       	PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&acc_timer));
 	}
