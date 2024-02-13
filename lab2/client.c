@@ -119,7 +119,7 @@ PROCESS_THREAD(event_timing, ev, data) {
     etimer_set(&event_timer, EVENT_INTERVAL);
 
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&event_timer));
-	post_process(&client_process, PROCESS_EVENT_TIMER, NULL);
+	process_post(&client_process, PROCESS_EVENT_TIMER, NULL);
  
     }
     PROCESS_END();
