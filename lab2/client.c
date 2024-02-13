@@ -92,7 +92,7 @@ PROCESS_THREAD(client_process, ev, data) {
 				NETSTACK_NETWORK.output(NULL);
 				printf("acc and btn Sent\n");
 			}
-		} else if(butten_triggered) {
+		} else if(button_triggered) {
 			nullnet_len = 2;
 			leds_toggle(LEDS_GREEN);
 			NETSTACK_NETWORK.output(NULL);
@@ -118,7 +118,7 @@ PROCESS_THREAD(event_timing, ev, data) {
       /* Set the LED off timer for 10 seconds */
     etimer_set(&event_timer, EVENT_INTERVAL);
 
-    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&ledETimer));
+    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&event_timer));
 	post_process(&client_process, PROCESS_EVENT_TIMER, NULL);
  
     }
