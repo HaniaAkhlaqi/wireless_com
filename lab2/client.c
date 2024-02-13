@@ -36,6 +36,7 @@ static void recv(const void *data, uint16_t len,
 PROCESS_THREAD(client_process, ev, data) {
 	static char payload[] = "hej";
 	int16_t x = 0;
+	int result;
 	PROCESS_BEGIN();
 
 	/* Activate the button sensor. */
@@ -66,17 +67,18 @@ PROCESS_THREAD(client_process, ev, data) {
 		memcpy(nullnet_buf, &payload, sizeof(payload));
     	nullnet_len = sizeof(payload);
 
-		result = process_post(&client_process, ev == sensors_event, data == button_sensor);
+		result = process_post(&client_process, ev == sensors_event, NULL);
 
 		if ((x > threshold) || (-1 * x > threshold)) {
-			leds_toggle(LEDS_RED);
 			NETSTACK_NETWORK.output(NULL);
+			leds_toggle(LEDS_RED);
+			printf("acc Sent\n");
 		}
 
 		if(result == PROCESS_ERR_OK) {
-			printf("Sent\n");
 			NETSTACK_NETWORK.output(NULL);
-			leds_toggle(LEDS_Green);
+			printf("btn Sent\n");
+			leds_toggle(LEDS_GREEN);
 		} else {
 			printf("Error\n");
 		}
