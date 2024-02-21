@@ -34,7 +34,7 @@ the local node is clicked.*/
 
     // Check if alarm should be triggered
     // This is just a placeholder condition, replace with your own logic
-    Boolean alarm_triggered = false;
+    int alarm_triggered = false;
     if (event_count >= MAX_NUMBER_OF_EVENTS) {
         alarm_triggered = true;
         leds_toggle(LEDS_BLUE);
@@ -46,7 +46,7 @@ void print_event_history(const struct event *event_history) {
     printf("Event History:\n");
     int i= 0;
     for (i = 0; i < MAX_NUMBER_OF_EVENTS; i++) {
-        printf("Event %d: Source = %d, Time = %lu\n", i, event_history[i].addr, event_history[i].time);
+        printf("Event %d: Source = %d, Time = %lu\n", i,(int)event_history[i].addr, event_history[i].time);
     }
 }
 static void recv(const void *data, uint16_t len,
