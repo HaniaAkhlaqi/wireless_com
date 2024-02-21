@@ -38,8 +38,9 @@ the local node is clicked.*/
     if (event_count >= MAX_NUMBER_OF_EVENTS) {
         alarm_triggered = true;
         if (alarm_triggered) {
+            leds_toggle(LEDS_YELLOW);
             leds_toggle(LEDS_BLUE);
-            print("Alarm triggered!\n");
+            printf("Alarm triggered!\n");
         }
     }
 }
