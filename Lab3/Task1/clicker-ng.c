@@ -15,15 +15,14 @@ AUTOSTART_PROCESSES(&clicker_ng_process);
 /*---------------------------------------------------------------------------*/
 
 struct event {
-  clock_time_t time = 0;
-  linkaddr_t addr = 0;
+  clock_time_t time;
+  linkaddr_t addr;
 };
 #define MAX_NUMBER_OF_EVENTS 3
 struct event event_history[MAX_NUMBER_OF_EVENTS];
 
 
-void
-handle event(const linkaddr t *src) {/* Updates the event history and checks if an alarm should be triggered. This function would be called when a broadcast packet is received, or when the button on
+void handle_event(const linkaddr t *src) {/* Updates the event history and checks if an alarm should be triggered. This function would be called when a broadcast packet is received, or when the button on
 the local node is clicked.*/
     static int event_count = 0;
     // Update event history
@@ -45,7 +44,7 @@ the local node is clicked.*/
 void print_event_history(const struct event *event_history) {
     printf("Event History:\n");
     for (int i = 0; i < MAX_NUMBER_OF_EVENTS; i++) {
-        printf("Event %d: Source = %d, Time = %lu\n", i, event_history[i].src, event_history[i].time);
+        printf("Event %d: Source = %d, Time = %lu\n", i, event_history[i].addr, event_history[i].time);
     }
 }
 static void recv(const void *data, uint16_t len,
@@ -82,7 +81,7 @@ PROCESS_THREAD(clicker_ng_process, ev, data)
      * broadcast handle. */
      NETSTACK_NETWORK.output(NULL);
 
-    print_event_history(&event_history);
+    print_event_history(event_history);
   }
 
   PROCESS_END();
