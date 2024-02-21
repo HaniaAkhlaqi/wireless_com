@@ -26,7 +26,7 @@ void handle_event(const linkaddr_t *src) {/* Updates the event history and check
 the local node is clicked.*/
     static int event_count = 0;
     // Update event history
-    if (event_count < MAX_EVENTS) {
+    if (event_count < MAX_NUMBER_OF_EVENTS) {
         event_history[event_count].src = *src;
         event_history[event_count].time = clock_time();
         event_count++;
@@ -43,7 +43,8 @@ the local node is clicked.*/
 
 void print_event_history(const struct event *event_history) {
     printf("Event History:\n");
-    for (int i = 0; i < MAX_NUMBER_OF_EVENTS; i++) {
+    int i= 0;
+    for (i = 0; i < MAX_NUMBER_OF_EVENTS; i++) {
         printf("Event %d: Source = %d, Time = %lu\n", i, event_history[i].addr, event_history[i].time);
     }
 }
@@ -51,7 +52,7 @@ static void recv(const void *data, uint16_t len,
   const linkaddr_t *src, const linkaddr_t *dest) {
   printf("Received: %s - from %d\n", (char*) data, src->u8[0]);
   leds_toggle(LEDS_GREEN);
-  event(src);
+  handle_event(src);
 }
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(clicker_ng_process, ev, data)
