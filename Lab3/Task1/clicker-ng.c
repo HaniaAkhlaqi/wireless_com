@@ -22,7 +22,7 @@ struct event {
 struct event event_history[MAX_NUMBER_OF_EVENTS];
 
 
-void handle_event(const linkaddr t *src) {/* Updates the event history and checks if an alarm should be triggered. This function would be called when a broadcast packet is received, or when the button on
+void handle_event(const linkaddr_t *src) {/* Updates the event history and checks if an alarm should be triggered. This function would be called when a broadcast packet is received, or when the button on
 the local node is clicked.*/
     static int event_count = 0;
     // Update event history
