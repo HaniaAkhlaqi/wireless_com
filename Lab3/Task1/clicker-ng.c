@@ -39,6 +39,7 @@ the local node is clicked.*/
         alarm_triggered = true;
         if (alarm_triggered) {
             leds_toggle(LEDS_BLUE);
+            print("Alarm triggered!\n");
         }
     }
 }
