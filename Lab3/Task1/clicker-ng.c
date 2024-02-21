@@ -7,11 +7,7 @@
 #include "net/netstack.h"
 #include "net/nullnet/nullnet.h"
 
-#include "sys/cc.h"
 
-#include "net/rime.h"
-#include "lib/list.h"
-#include "lib/memb.h"
 
 /*---------------------------------------------------------------------------*/
 PROCESS(clicker_ng_process, "Clicker NG Process");
