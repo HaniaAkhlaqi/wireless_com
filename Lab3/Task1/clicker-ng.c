@@ -27,13 +27,14 @@ the local node is clicked.*/
     static int event_count = 0;
     // Update event history
     if (event_count < MAX_NUMBER_OF_EVENTS) {
-        event_history[event_count].src = *src;
+        event_history[event_count].addr = *src;
         event_history[event_count].time = clock_time();
         event_count++;
     }
 
     // Check if alarm should be triggered
     // This is just a placeholder condition, replace with your own logic
+    Boolean alarm_triggered = false;
     if (event_count >= MAX_NUMBER_OF_EVENTS) {
         alarm_triggered = true;
         leds_toggle(LEDS_BLUE);
