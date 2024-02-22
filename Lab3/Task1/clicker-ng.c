@@ -21,13 +21,14 @@ struct event {
 #define MAX_NUMBER_OF_EVENTS 3
 struct event event_history[MAX_NUMBER_OF_EVENTS];
 
-/* Initialize the history of events */
-static int i = 0;
-for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
+void event_history_init(struct event *event_history) {
+  int i = 0;
+  for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
     event_history[i].addr = NULL;
     event_history[i].time = (clock_time_t) 0* CLOCK_SECOND;
-}
+  }
   printf("Event history initialized\n");
+}
 
 /* Updates the event history and checks if an alarm should be triggered. This function would be called when a broadcast packet is received, or when the button on
 the local node is clicked.*/
@@ -97,7 +98,8 @@ PROCESS_THREAD(clicker_ng_process, ev, data)
   static char payload[] = "hej";
 
   PROCESS_BEGIN();
-
+  
+  event_history_init(event_history);
   print_event_history(event_history);
 
 
