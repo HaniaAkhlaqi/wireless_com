@@ -46,7 +46,8 @@ the local node is clicked.*/
             printf("Alarm triggered!\n");
         }
       }
-      for(int i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
+      static int i = 0;
+      for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
         event_history[i] = event_history[i+1];
       }
     
