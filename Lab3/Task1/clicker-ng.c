@@ -36,7 +36,7 @@ the local node is clicked.*/
     // This is just a placeholder condition, replace with your own logic
     int alarm_triggered = false;
     if (event_count >= MAX_NUMBER_OF_EVENTS) {
-      clock_time_t event_duration = (clock_time_t) event_history[MAX_NUMBER_OF_EVENTS-1].time - event_history[0].time;
+      clock_time_t event_duration = (clock_time_t) event_history[MAX_NUMBER_OF_EVENTS].time - event_history[0].time;
       if (event_duration < (clock_time_t) 30) {
         alarm_triggered = true;
         if (alarm_triggered) {
