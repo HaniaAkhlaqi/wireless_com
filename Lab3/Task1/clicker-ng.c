@@ -38,7 +38,7 @@ the local node is clicked.*/
     if (event_count >= MAX_NUMBER_OF_EVENTS) {
       clock_time_t event_duration = (clock_time_t) event_history[MAX_NUMBER_OF_EVENTS-1].time - event_history[0].time;
       printf("Event duration: %lu\n", event_duration);
-      if (event_duration < (clock_time_t) 30) {
+      if (event_duration < (clock_time_t) 30*CLOCK_SECOND) {
         alarm_triggered = true;
         if (alarm_triggered) {
             leds_toggle(LEDS_YELLOW);
