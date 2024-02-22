@@ -27,7 +27,7 @@ the local node is clicked.*/
     static int event_count = 0;
     // Update event history
     if (event_count < MAX_NUMBER_OF_EVENTS) {
-        event_history[event_count].addr = src;
+        event_history[event_count].addr = *src;
         event_history[event_count].time = clock_time();
         event_count++;
     }
@@ -55,7 +55,7 @@ void print_event_history(const struct event *event_history) {
     printf("Event History:\n");
     int i= 0;
     for (i = 0; i < MAX_NUMBER_OF_EVENTS; i++) {
-        printf("Event %d: Source = %d, Time = %lu\n", i, event_history[i].addr.u8[0], event_history[i].time);
+        printf("Event %d: Source = %d, Time = %lu\n", i, event_history[i].addr->u8[0], event_history[i].time);
     }
 }
 static void recv(const void *data, uint16_t len,
