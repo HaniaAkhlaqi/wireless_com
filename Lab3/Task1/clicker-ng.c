@@ -62,6 +62,10 @@ void handle_event(const linkaddr_t *src) {
       for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
         event_history[i] = event_history[i+1];
         printf("removed old event\n");
+        leds_toggle(LEDS_RED);
+        leds_toggle(LEDS_GREEN);
+        leds_toggle(LEDS_BLUE);
+        leds_toggle(LEDS_YELLOW);
       } 
     }
 
@@ -71,6 +75,7 @@ void handle_event(const linkaddr_t *src) {
       if (alarm_interval > (clock_time_t)30 * CLOCK_SECOND) {
         unique_node_count = 0;
         event_count = 0;
+
         printf("Event history cleared\n");
       }
     }
