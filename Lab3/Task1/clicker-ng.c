@@ -33,7 +33,7 @@ void handle_event(const linkaddr_t *src) {
     if (alarm_interval > (clock_time_t)30 * CLOCK_SECOND) {
         int i;
         for (i = 0; i < MAX_NUMBER_OF_EVENTS; i++) {
-            event_history[i].addr = 0;
+            event_history[i].addr = (linkaddr_t) 0;
             event_history[i].time = (clock_time_t) 0* CLOCK_SECOND;
         }
         unique_node_count = 0;
