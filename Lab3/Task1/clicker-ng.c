@@ -65,12 +65,12 @@ void handle_event(const linkaddr_t *src) {
       } 
     }
 
-    //Clear event history between alarms, constraint for alarm delays is 30 seconds
-    clock_time_t alarm_interval = (clock_time_t)(event_history[MAX_NUMBER_OF_EVENTS - 1].time - clock_time());
-      if (alarm_interval > (clock_time_t)30 * CLOCK_SECOND) {
-        unique_node_count = 0;
-        event_count = 0;
-    }
+    // //Clear event history between alarms, constraint for alarm delays is 30 seconds
+    // clock_time_t alarm_interval = (clock_time_t)(event_history[MAX_NUMBER_OF_EVENTS - 1].time - clock_time());
+    //   if (alarm_interval > (clock_time_t)30 * CLOCK_SECOND) {
+    //     unique_node_count = 0;
+    //     event_count = 0;
+    // }
     
     // // Clear event history if maximum number of events is reached
     // if (event_count >= MAX_NUMBER_OF_EVENTS) {
