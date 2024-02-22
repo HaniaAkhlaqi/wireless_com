@@ -21,12 +21,16 @@ struct event {
 #define MAX_NUMBER_OF_EVENTS 3
 struct event event_history[MAX_NUMBER_OF_EVENTS];
 
-
-void handle_event(const linkaddr_t *src) {/* Updates the event history and checks if an alarm should be triggered. This function would be called when a broadcast packet is received, or when the button on
+/* Updates the event history and checks if an alarm should be triggered. This function would be called when a broadcast packet is received, or when the button on
 the local node is clicked.*/
+void handle_event(const linkaddr_t *src) {
     static int event_count = 0;
-    // Update event history
     if (event_count < MAX_NUMBER_OF_EVENTS) {
+      /*if we receive consecutive event from the same node just update the event clock*/
+      if(linkaddr_cmp(src, event_history[event_count-1].addr)) {
+        event_history[event_count-1].time = clock_time();
+      }
+      /*else register a new unique event*/
         event_history[event_count].addr = src;
         event_history[event_count].time = clock_time();
         event_count++;
@@ -49,6 +53,7 @@ the local node is clicked.*/
       static int i = 0;
       for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
         event_history[i] = event_history[i+1];
+        printf("removed old history");
       }
     
 }
