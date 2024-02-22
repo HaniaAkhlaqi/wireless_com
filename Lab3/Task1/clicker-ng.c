@@ -30,7 +30,7 @@ void handle_event(const linkaddr_t *src) {
       static int j = 0;
       int found = 0;
       for(j = 0; j < MAX_NUMBER_OF_EVENTS-1; j++) {
-        if(linkaddr_cmp(&event_history[j].addr, src)) {
+        if(linkaddr_cmp(event_history[j].addr, src)) {
           event_history[j].time = clock_time();
           found = 1;
           printf("Event updated\n");
