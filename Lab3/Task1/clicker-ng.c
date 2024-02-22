@@ -47,22 +47,21 @@ void handle_event(const linkaddr_t *src) {
             unique_node_count++;
             printf("New event registered from Node %d\n", src->u8[0]);
         }
-
+    }
         // Check if alarm should be triggered
-        if (unique_node_count >= MAX_NUMBER_OF_EVENTS) {
-            clock_time_t event_duration = (clock_time_t)(event_history[MAX_NUMBER_OF_EVENTS - 1].time - event_history[0].time);
-            printf("Event duration: %lu\n", event_duration);
-            if (event_duration < (clock_time_t)30 * CLOCK_SECOND) {
-                leds_toggle(LEDS_YELLOW);
-                leds_toggle(LEDS_BLUE);
-                printf("ALARM triggered!\n");
-            }
-            static int i = 0;
-            for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
-              event_history[i] = event_history[i+1];
-              printf("removed old history\n");
-            } 
-        }
+    if (unique_node_count >= MAX_NUMBER_OF_EVENTS) {
+      clock_time_t event_duration = (clock_time_t)(event_history[MAX_NUMBER_OF_EVENTS - 1].time - event_history[0].time);
+      printf("Event duration: %lu\n", event_duration);
+      if (event_duration < (clock_time_t)30 * CLOCK_SECOND) {
+        leds_toggle(LEDS_YELLOW);
+        leds_toggle(LEDS_BLUE);
+        printf("ALARM triggered!\n");
+      }
+      static int i = 0;
+      for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
+        event_history[i] = event_history[i+1];
+        printf("removed old history\n");
+      } 
     }
 
     // Clear event history if maximum number of events is reached
