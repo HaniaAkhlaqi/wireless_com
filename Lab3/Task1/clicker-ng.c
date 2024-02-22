@@ -64,11 +64,11 @@ void handle_event(const linkaddr_t *src) {
       } 
     }
 
-    // Clear event history if maximum number of events is reached
-    if (event_count >= MAX_NUMBER_OF_EVENTS) {
-        event_count = 0;
-        unique_node_count = 0;
-    }
+    // // Clear event history if maximum number of events is reached
+    // if (event_count >= MAX_NUMBER_OF_EVENTS) {
+    //     event_count = 0;
+    //     unique_node_count = 0;
+    // }
 
  
 }
