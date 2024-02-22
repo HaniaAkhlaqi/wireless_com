@@ -90,7 +90,14 @@ PROCESS_THREAD(clicker_ng_process, ev, data)
 
   PROCESS_BEGIN();
 
+  /* Initialize the history of events */
+  static int i = 0;
+  for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
+    event_history[i].addr = NULL;
+    event_history[i].time = (clock_time_t) 0* CLOCK_SECOND;
+  }
   print_event_history(event_history);
+
 
   
   /* Initialize NullNet */
