@@ -19,7 +19,7 @@ struct event {
   const linkaddr_t *addr;
 };
 #define MAX_NUMBER_OF_EVENTS 3
-struct event event_history[MAX_NUMBER_OF_EVENTS];
+struct event event_history[];
 
 /* Updates the event history and checks if an alarm should be triggered. This function would be called when a broadcast packet is received, or when the button on
 the local node is clicked.*/
@@ -96,6 +96,7 @@ PROCESS_THREAD(clicker_ng_process, ev, data)
     event_history[i].addr = NULL;
     event_history[i].time = (clock_time_t) 0* CLOCK_SECOND;
   }
+  printf("Event history initialized\n");
   print_event_history(event_history);
 
 
