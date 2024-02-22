@@ -25,7 +25,7 @@ void event_history_init(struct event *event_history) {
   int i = 0;
   for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
     //event_history[i].addr = NULL;
-    memcpy(&event_history[i].addr, NULL, sizeof(linkaddr_t));
+    memcpy(&event_history[i].addr, 0, sizeof(linkaddr_t));
     event_history[i].time = (clock_time_t) 0* CLOCK_SECOND;
   }
   printf("Event history initialized\n");
