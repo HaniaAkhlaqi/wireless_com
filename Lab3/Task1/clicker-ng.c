@@ -75,7 +75,7 @@ void handle_event(const linkaddr_t *src) {
         printf("Event history cleared\n");
 
         leds_off(LEDS_GREEN);
-        leds_off(LEDS_RED);(LEDS_BLUE);
+        leds_off(LEDS_BLUE);
         leds_off(LEDS_YELLOW);
       }
     }
