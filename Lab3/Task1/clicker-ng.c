@@ -6,6 +6,7 @@
 #include "dev/leds.h"
 #include "net/netstack.h"
 #include "net/nullnet/nullnet.h"
+#include "net/rime.h"
 
 
 
