@@ -57,6 +57,11 @@ void handle_event(const linkaddr_t *src) {
                 leds_toggle(LEDS_BLUE);
                 printf("ALARM triggered!\n");
             }
+            static int i = 0;
+            for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
+              event_history[i] = event_history[i+1];
+              printf("removed old history\n");
+            } 
         }
     }
 
@@ -65,6 +70,8 @@ void handle_event(const linkaddr_t *src) {
         event_count = 0;
         unique_node_count = 0;
     }
+
+ 
 }
 
 static void recv(const void *data, uint16_t len, const linkaddr_t *src, const linkaddr_t *dest) {
