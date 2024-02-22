@@ -27,6 +27,18 @@ static uint8_t unique_node_count = 0;
 
 // Function to handle event and check for alarm triggering
 void handle_event(const linkaddr_t *src) {
+
+    //Clear event history between alarms, constraint for alarm delays is 30 seconds
+    clock_time_t alarm_interval = (clock_time_t)(event_history[MAX_NUMBER_OF_EVENTS - 1].time - clock_time());
+    if (alarm_interval > (clock_time_t)30 * CLOCK_SECOND) {
+        int i;
+        for (i = 0; i < MAX_NUMBER_OF_EVENTS; i++) {
+            event_history[i].addr = NULL;
+            event_history[i].time = (clock_time_t) 0* CLOCK_SECOND;
+        }
+        unique_node_count = 0;
+    }
+
     static int event_count = 0;
     if (event_count < MAX_NUMBER_OF_EVENTS) {
         // Check if the source node is already recorded in event history
@@ -64,6 +76,7 @@ void handle_event(const linkaddr_t *src) {
       } 
     }
 
+    
     // // Clear event history if maximum number of events is reached
     // if (event_count >= MAX_NUMBER_OF_EVENTS) {
     //     event_count = 0;
