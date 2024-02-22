@@ -25,6 +25,9 @@ struct event event_history[MAX_NUMBER_OF_EVENTS];
 // Variable to track the number of unique nodes that have triggered events
 static uint8_t unique_node_count = 0;
 
+// Timer for resetting the alarm state
+static struct etimer alarm_reset_timer;
+
 // Function to handle event and check for alarm triggering
 void handle_event(const linkaddr_t *src) {
 
@@ -57,28 +60,31 @@ void handle_event(const linkaddr_t *src) {
         leds_toggle(LEDS_YELLOW);
         leds_toggle(LEDS_BLUE);
         printf("ALARM triggered!\n");
+        etimer_set(&alarm_reset_timer, CLOCK_SECOND * 30);
       }
       static int i = 0;
       for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
         event_history[i] = event_history[i+1];
         printf("removed old event\n");
       } 
+
+
     }
 
-    // Clear event history if maximum number of events is reached & time between alarms is too long
-    if (event_count >= MAX_NUMBER_OF_EVENTS) {
-      clock_time_t alarm_interval = (clock_time_t)(event_history[MAX_NUMBER_OF_EVENTS - 1].time - clock_time());
-      if (alarm_interval > (clock_time_t)30 * CLOCK_SECOND) {
-        unique_node_count = 0;
-        event_count = 0;
+    // // Clear event history if maximum number of events is reached & time between alarms is too long
+    // if (event_count >= MAX_NUMBER_OF_EVENTS) {
+    //   clock_time_t alarm_interval = (clock_time_t)(event_history[MAX_NUMBER_OF_EVENTS - 1].time - clock_time());
+    //   if (alarm_interval > (clock_time_t)30 * CLOCK_SECOND) {
+    //     unique_node_count = 0;
+    //     event_count = 0;
 
-        printf("Event history cleared\n");
+    //     printf("Event history cleared\n");
 
-        leds_off(LEDS_GREEN);
-        leds_off(LEDS_BLUE);
-        leds_off(LEDS_YELLOW);
-      }
-    }
+    //     leds_off(LEDS_GREEN);
+    //     leds_off(LEDS_BLUE);
+    //     leds_off(LEDS_YELLOW);
+    //   }
+    // }
 
  
 }
@@ -105,6 +111,16 @@ PROCESS_THREAD(clicker_ng_process, ev, data) {
 
     while (1) {
         PROCESS_WAIT_EVENT_UNTIL(ev == sensors_event && data == &button_sensor);
+
+        
+        // Check if the alarm reset timer has expired
+        if (etimer_expired(&alarm_reset_timer)) {
+            unique_node_count = 0;
+            printf("Alarm reset\n");
+            leds_off(LEDS_GREEN);
+            leds_off(LEDS_BLUE);
+            leds_off(LEDS_YELLOW);
+        }
 
         memcpy(nullnet_buf, &payload, sizeof(payload));
         nullnet_len = sizeof(payload);
