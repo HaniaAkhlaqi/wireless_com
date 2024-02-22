@@ -24,8 +24,7 @@ struct event event_history[MAX_NUMBER_OF_EVENTS];
 void event_history_init(struct event *event_history) {
   int i = 0;
   for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
-    //event_history[i].addr = NULL;
-    memcpy(&event_history[i].addr, 0, sizeof(linkaddr_t));
+    event_history[i].addr = NULL;
     event_history[i].time = (clock_time_t) 0* CLOCK_SECOND;
   }
   printf("Event history initialized\n");
@@ -40,7 +39,7 @@ void handle_event(const linkaddr_t *src) {
       static int j = 0;
       int found = 0;
       for(j = 0; j < MAX_NUMBER_OF_EVENTS-1; j++) {
-        if(linkaddr_cmp(event_history[j].addr, src)) {
+        if(rimeaddr_cmp(event_history[j].addr, src) != 0) {
           event_history[j].time = clock_time();
           found = 1;
           printf("Event updated\n");
