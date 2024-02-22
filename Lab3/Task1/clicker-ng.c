@@ -27,13 +27,23 @@ void handle_event(const linkaddr_t *src) {
     static int event_count = 0;
     if (event_count < MAX_NUMBER_OF_EVENTS) {
       /*if we receive consecutive event from the same node just update the event clock*/
-      if(linkaddr_cmp(src, event_history[event_count-1].addr)) {
-        event_history[event_count-1].time = clock_time();
+      static int j = 0;
+      int found = 0;
+      for(j = 0; j < MAX_NUMBER_OF_EVENTS-1; j++) {
+        if(linkaddr_cmp(&event_history[j].addr, src)) {
+          event_history[j].time = clock_time();
+          found = 1;
+          printf("Event updated\n");
+          break;
+        }
       }
-      /*else register a new unique event*/
+      /*register a new unique event*/
+      if(found == 0) {
         event_history[event_count].addr = src;
         event_history[event_count].time = clock_time();
         event_count++;
+        printf("New event registered\n");
+    }
     }
 
     // Check if alarm should be triggered
@@ -53,7 +63,7 @@ void handle_event(const linkaddr_t *src) {
       static int i = 0;
       for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
         event_history[i] = event_history[i+1];
-        printf("removed old history");
+        printf("removed old history\n");
       }
     
 }
