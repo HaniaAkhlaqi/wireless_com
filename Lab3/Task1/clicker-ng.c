@@ -24,7 +24,8 @@ struct event event_history[MAX_NUMBER_OF_EVENTS];
 void event_history_init(struct event *event_history) {
   int i = 0;
   for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
-    event_history[i].addr = NULL;
+    //event_history[i].addr = NULL;
+    memcpy(&event_history[i].addr, NULL, sizeof(linkaddr_t));
     event_history[i].time = (clock_time_t) 0* CLOCK_SECOND;
   }
   printf("Event history initialized\n");
@@ -36,9 +37,9 @@ void handle_event(const linkaddr_t *src) {
     static int event_count = 0;
     if (event_count < MAX_NUMBER_OF_EVENTS) {
       /*if we receive consecutive event from the same node just update the event clock*/
-      static int j = MAX_NUMBER_OF_EVENTS-1;
+      static int j = 0;
       int found = 0;
-      for(j ; j > 0; j--) {
+      for(j = 0; j < MAX_NUMBER_OF_EVENTS-1; j++) {
         if(linkaddr_cmp(event_history[j].addr, src)) {
           event_history[j].time = clock_time();
           found = 1;
@@ -98,8 +99,8 @@ PROCESS_THREAD(clicker_ng_process, ev, data)
   static char payload[] = "hej";
 
   PROCESS_BEGIN();
-
   event_history_init(event_history);
+
   print_event_history(event_history);
 
 
