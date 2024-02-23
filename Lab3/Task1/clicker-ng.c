@@ -62,14 +62,15 @@ void handle_event(const linkaddr_t *src) {
         leds_toggle(LEDS_YELLOW);
         leds_toggle(LEDS_BLUE);
         printf("ALARM triggered!\n");
-      } else {
+      }
         alarm_triggered = 0;
+        leds_off(LEDS_YELLOW);
+        leds_off(LEDS_BLUE);
         static int i = 0;
         for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
         event_history[i] = event_history[i+1];
         event_count--;
-        printf("removed old event\n");
-        } 
+        printf("removed old event\n"); 
       }
      
     }
