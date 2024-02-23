@@ -28,6 +28,9 @@ static uint8_t unique_node_count = 0;
 //variable to track if alarm is triggered
 static uint8_t alarm_triggered = 0;
 
+// Timer for alarm duration
+static struct etimer alarm_timer;
+
 // Function to handle event and check for alarm triggering
 void handle_event(const linkaddr_t *src) {
 
@@ -62,35 +65,29 @@ void handle_event(const linkaddr_t *src) {
         leds_toggle(LEDS_YELLOW);
         leds_toggle(LEDS_BLUE);
         printf("ALARM triggered!\n");
+        etimer_set(&alarm_timer, CLOCK_SECOND * 30);
       }
-        alarm_triggered = 0;
-        leds_off(LEDS_YELLOW);
-        leds_off(LEDS_BLUE);
-        static int i = 0;
-        for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
-        event_history[i] = event_history[i+1];
-        event_count--;
-        printf("removed old event\n"); 
+      alarm_triggered = 0;
+      static int i = 0;
+      for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
+      event_history[i] = event_history[i+1];
+      event_count--;
+      unique_node_count--;
+      printf("removed old event\n"); 
       }
      
     }
-
-    // // Clear event history if maximum number of events is reached & time between alarms is too long
-    // if (event_count >= MAX_NUMBER_OF_EVENTS) {
-    //   clock_time_t alarm_interval = (clock_time_t)(event_history[MAX_NUMBER_OF_EVENTS - 1].time - clock_time());
-    //   if (alarm_interval > (clock_time_t)30 * CLOCK_SECOND) {
-    //     unique_node_count = 0;
-    //     event_count = 0;
-
-    //     printf("Event history cleared\n");
-
-    //     leds_off(LEDS_GREEN);
-    //     leds_off(LEDS_BLUE);
-    //     leds_off(LEDS_YELLOW);
-    //   }
-    // }
-
  
+}
+
+// Timer callback function to reset the alarm state
+static void reset_alarm_timer_callback() {
+    alarm_triggered = 0;
+    if (alarm_triggered) {
+        leds_toggle(LEDS_YELLOW);
+        leds_toggle(LEDS_BLUE);
+        printf("Alarm reset\n");
+    }
 }
 
 static void recv(const void *data, uint16_t len, const linkaddr_t *src, const linkaddr_t *dest) {
@@ -115,6 +112,11 @@ PROCESS_THREAD(clicker_ng_process, ev, data) {
 
     while (1) {
         PROCESS_WAIT_EVENT_UNTIL(ev == sensors_event && data == &button_sensor);
+
+
+        if (etimer_expired(&alarm_timer)) {
+            reset_alarm_timer_callback();
+        }
 
         memcpy(nullnet_buf, &payload, sizeof(payload));
         nullnet_len = sizeof(payload);
