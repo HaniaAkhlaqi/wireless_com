@@ -67,10 +67,10 @@ void handle_event(const linkaddr_t *src) {
       // leds_toggle(LEDS_YELLOW);
       // leds_toggle(LEDS_BLUE);
       static int i = 0;
-      for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
+      for(i = 0; i < MAX_NUMBER_OF_EVENTS-2; i++) {
       event_history[i] = event_history[i+1];
       event_count--;
-      //unique_node_count--;
+      unique_node_count--;
       printf("removed old event\n"); 
       }
      
