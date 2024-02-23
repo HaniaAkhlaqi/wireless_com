@@ -64,8 +64,8 @@ void handle_event(const linkaddr_t *src) {
         printf("ALARM triggered!\n");
       }
       alarm_triggered = 0;
-      leds_toggle(LEDS_YELLOW);
-      leds_toggle(LEDS_BLUE);
+      // leds_toggle(LEDS_YELLOW);
+      // leds_toggle(LEDS_BLUE);
       static int i = 0;
       for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
       event_history[i] = event_history[i+1];
