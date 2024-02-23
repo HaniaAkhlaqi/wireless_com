@@ -62,7 +62,6 @@ void handle_event(const linkaddr_t *src) {
         leds_toggle(LEDS_YELLOW);
         leds_toggle(LEDS_BLUE);
         printf("ALARM triggered!\n");
-        etimer_set(&alarm_timer, CLOCK_SECOND * 30);
       }
       alarm_triggered = 0;
       leds_toggle(LEDS_YELLOW);
