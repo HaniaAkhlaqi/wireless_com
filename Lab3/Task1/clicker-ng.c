@@ -69,7 +69,7 @@ void handle_event(const linkaddr_t *src) {
       }
       alarm_triggered = 0;
       static int i = 0;
-      for(i = 0; i < MAX_NUMBER_OF_EVENTS; i++) {
+      for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
       event_history[i] = event_history[i+1];
       event_count--;
       unique_node_count--;
