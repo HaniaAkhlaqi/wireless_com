@@ -70,7 +70,7 @@ void handle_event(const linkaddr_t *src) {
       for(i = 0; i < MAX_NUMBER_OF_EVENTS-1; i++) {
       event_history[i] = event_history[i+1];
       event_count--;
-      unique_node_count--;
+      //unique_node_count--;
       printf("removed old event\n"); 
       }
      
